@@ -1,6 +1,6 @@
-(ns stats-generator.core-test
+(ns stats-generator.main-test
   (:require [clojure.test :refer :all]
-            [stats-generator.core :refer :all]))
+            [stats-generator.main :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
