@@ -47,27 +47,27 @@
 
 (defn now [] (new java.util.Date))
 
-(defn roll-all-18s [roll-type]
- (let [counter (atom 0)]
-   (println "STARTED AT:" (now))
-    (loop [current-roll []]
-      (swap! counter inc)
-      (cond
-        (= 100000000 @counter)
-        (do
-          (println "Gave up after ONE HUNDRED MILLION sets...")
-          (println "ENDED AT:" (now)))
+(defn roll-all-18s []
+  (println "STARTED AT:" (now))
+  (loop [counter 1
+         current-roll (roll-stats)]
+    (cond
+      (= [18 18 18 18 18 18] current-roll)
+      (do
+        (println "All 18s took" counter "attempt(s).")
+        (println "ENDED AT:" (now)))
 
-        (= [18 18 18 18 18 18] current-roll)
-        (do
-          (println "All 18s took" @counter "attempt(s).")
-          (println "ENDED AT:" (now)))
+      (= 100000000 counter)
+      (do
+        (println "Gave up after ONE HUNDRED MILLION sets...")
+        (println "ENDED AT:" (now)))
 
-        :default
-        (do
-          (when (<= 5 (count (filter #(= 18 %) current-roll)))
-            (println "close call!" current-roll))
-          (recur (roll-stats roll-type)))))))
+      :default
+      (do
+        (when (<= 5 (count (filter #(= 18 %) current-roll)))
+          (println "close call!" current-roll))
+        (recur (inc counter)
+               (roll-stats))))))
 
 (defn -main
   [& args]
