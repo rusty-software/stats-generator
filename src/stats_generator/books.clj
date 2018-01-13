@@ -38,6 +38,17 @@
         ordered-books (top-books-by-comparator books < books-count)]
     (last (take median-position ordered-books))))
 
+(defn books-per-month [books]
+  (let [dates (map :date-read books)
+        months (map #(-> %
+                         (clojure.string/split #"/")
+                         (first)
+                         (Integer/parseInt)) dates)
+        month-counts (frequencies months)]
+    (-> months
+        (frequencies)
+        (sort))))
+
 (defn stats []
   (with-open [reader (io/reader "/Users/IronFuryMBP/Downloads/2017books.txt")]
     (let [raw-data (csv/read-csv reader :separator \tab)
@@ -52,6 +63,7 @@
           sb (smallest-books books)
           page-count-mean (int (/ total-pages (count books)))
           page-count-median (median-by-page-count books)
+          bpm (books-per-month books)
           ]
       (println "Most frequent authors")
       (pprint mfa)
@@ -66,5 +78,7 @@
       (println)
       (println "Median page count:" page-count-median)
       (println)
+      (println "Books per month")
+      (pprint bpm)
       ))
   )
