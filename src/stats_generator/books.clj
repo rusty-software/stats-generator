@@ -53,7 +53,7 @@
   (with-open [reader (io/reader "/Users/IronFuryMBP/Downloads/2017books.txt")]
     (let [raw-data (csv/read-csv reader :separator \tab)
           books (->books raw-data)
-          mfa (most-frequent-authors books)
+          mfa (filter #(<= 2 (second %)) (frequencies (map :author books)))
           total-pages (apply + (map (fn [s]
                                       (-> s
                                           :number-of-pages
@@ -64,6 +64,7 @@
           page-count-mean (int (/ total-pages (count books)))
           page-count-median (median-by-page-count books)
           bpm (books-per-month books)
+          media (frequencies (map :binding books))
           ]
       (println "Most frequent authors")
       (pprint mfa)
@@ -72,13 +73,19 @@
       (println)
       (println "Biggest books")
       (pprint bb)
+      (println)
       (println "Smallest books")
       (pprint sb)
+      (println)
       (println "Mean page count:" page-count-mean)
       (println)
       (println "Median page count:" page-count-median)
       (println)
       (println "Books per month")
       (pprint bpm)
+      (println)
+      (println "Books per media")
+      (pprint media)
+      (println)
       ))
   )
