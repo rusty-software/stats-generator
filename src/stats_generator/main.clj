@@ -35,39 +35,34 @@
        (drop-lowest)
        (sum))))
 
-(defmulti roll-stats identity)
-
-(defmethod roll-stats :roll-4-keep-3
-  [_]
-  (map roll-4-keep-3 (range 6)))
-
-(defmethod roll-stats :range-3-to-18
-  [_]
-  (map roll-d3-18 (range 6)))
+(def roll-strategy
+  {:roll-4-keep-3 roll-4-keep-3
+   :range-3-to-18 roll-d3-18})
 
 (defn now [] (new java.util.Date))
 
-(defn roll-all-18s []
+(defn roll-all-18s [strategy]
   (println "STARTED AT:" (now))
-  (loop [counter 1
-         current-roll (roll-stats)]
-    (cond
-      (= [18 18 18 18 18 18] current-roll)
-      (do
-        (println "All 18s took" counter "attempt(s).")
-        (println "ENDED AT:" (now)))
+  (let [roll-stats (fn [] (map (get roll-strategy strategy) (range 6)))]
+    (loop [counter 1
+           current-roll (roll-stats)]
+      (cond
+        (= [18 18 18 18 18 18] current-roll)
+        (do
+          (println "All 18s took" counter "attempt(s).")
+          (println "ENDED AT:" (now)))
 
-      (= 100000000 counter)
-      (do
-        (println "Gave up after ONE HUNDRED MILLION sets...")
-        (println "ENDED AT:" (now)))
+        (= 100000000 counter)
+        (do
+          (println "Gave up after ONE HUNDRED MILLION sets...")
+          (println "ENDED AT:" (now)))
 
-      :default
-      (do
-        (when (<= 5 (count (filter #(= 18 %) current-roll)))
-          (println "close call!" current-roll))
-        (recur (inc counter)
-               (roll-stats))))))
+        :default
+        (do
+          (when (<= 5 (count (filter #(= 18 %) current-roll)))
+            (println "close call!" current-roll))
+          (recur (inc counter)
+                 (roll-stats)))))))
 
 (defn -main
   [& args]
