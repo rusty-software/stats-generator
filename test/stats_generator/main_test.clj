@@ -25,8 +25,3 @@
 (deftest test-roll-4-keep-3
   (testing "Given a roll of 4 6-sided dice, sums the highest 3"
     (is (<= 3 (main/roll-4-keep-3) 18))))
-
-(deftest test-roll-stats
-  (let [stats (main/roll-stats)]
-    (is (= 6 (count stats)))
-    (is (every? #(<= 3 % 18) stats))))

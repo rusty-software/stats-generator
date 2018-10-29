@@ -1,8 +1,8 @@
 (ns stats-generator.books
-  (require [clojure.data.csv :as csv]
-           [clojure.java.io :as io]
-           [clojure.pprint :refer [pprint]]
-           [clojure.string :as str]))
+  (:require [clojure.data.csv :as csv]
+            [clojure.java.io :as io]
+            [clojure.pprint :refer [pprint]]
+            [clojure.string :as str]))
 
 (defn ->books [raw-data]
   (map zipmap
