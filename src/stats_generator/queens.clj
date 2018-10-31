@@ -12,7 +12,7 @@
           [[r c] false])))
 
 (defn queen-space
-  "Given a board and row, returns the column in which a queen resides, -1 if no queen is found."
+  "Given a board and row, returns the coordinates in which a queen resides, nil if no queen is found."
   [board row-num]
   (let [space (filter #(and (= row-num (first (key %)))
                             (val %))
@@ -54,21 +54,13 @@
                                 (val %))
                           board))))
 
-
-
 (defn place-next-queen
   "Given a board, size, and a queen number to place, returns a placement result with an indicator of whether or not the queen was successfully placed and an updated board.
 
   Uses the fact that only one queen per row is allowed, and only attempts insertion into that row."
-  ([board board-size queen-to-place]
-    (place-next-queen board board-size queen-to-place false))
-  ([board board-size queen-to-place move-queen-right?]
-   (loop [{:keys [board column] :as state} {:board board :column 0}]
-     (let [queen-space-this-row (queen-space board queen-to-place)
-           column (if (and move-queen-right? queen-space-this-row)
-                    (inc (second queen-space-this-row))
-                    column)
-           space [queen-to-place column]]
+  [board board-size queen-to-place]
+  (loop [{:keys [board column] :as state} {:board board :column 0}]
+     (let [space [queen-to-place column]]
        (cond
          (= board-size column)
          (assoc state :queen-placed? false)
@@ -80,17 +72,39 @@
              (assoc :queen-placed? true))
 
          :else
-         (recur (update state :column inc)))))))
+         (recur (update state :column inc))))))
+
+(defn move-placed-queen
+  "Given a board, board size, and row number, returns a placement result with an indicator of whether or not the queen was successfully moved and an updated board."
+  [board board-size row-num]
+  (let [queen-loc (queen-space board row-num)
+        column-num (second queen-loc)
+        updated-board (assoc board queen-loc false)
+        initial-state {:board updated-board
+                       :column (inc column-num)}]
+    (loop [{:keys [board column] :as state} initial-state]
+      (let [space [row-num column]]
+        (cond
+          (= board-size column)
+          (assoc state :queen-moved? false)
+
+          (not (or (queen-in-column? column board)
+                   (queen-in-diagonal? space board)))
+          (-> state
+              (assoc-in [:board space] true)
+              (assoc :queen-moved? true))
+
+          :else
+          (recur (update state :column inc)))))))
 
 (defn solve
   "Produces a solution to the queens puzzle given a number of queens. Board size will be the same dimension as number of queens."
   [n]
-  #_(let [board (init-board n)
+  (let [board (init-board n)
         initial-state {:board board
                        :queen-to-place 0
-                       :queen-placed? false}]
+                       :queen-placed? true}]
     (loop [{:keys [board queen-to-place queen-placed?] :as state} initial-state]
-      (println board)
       (cond
         (= n queen-to-place)
         {:result :solved :board board}
@@ -100,7 +114,14 @@
         {:result :unsolvable :board board}
 
         (not queen-placed?)
-        (let [placement-result (place-next-queen board n (dec queen-to-place) true)])
+        (let [placement-result (move-placed-queen board n (dec queen-to-place))]
+          (if (:queen-moved? placement-result)
+            (recur (assoc state :queen-placed? true
+                                :queen-to-place queen-to-place
+                                :board (:board placement-result)))
+            (recur (assoc state :queen-placed? false
+                                :queen-to-place (dec queen-to-place)
+                                :board (:board placement-result)))))
 
         :else
         (let [placement-result (place-next-queen board n queen-to-place)]

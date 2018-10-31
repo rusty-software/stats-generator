@@ -8,7 +8,7 @@
           [2 0] false [2 1] false [2 2] false}
          (q/init-board 3))))
 
-(deftest test-queen-space
+#_(deftest test-queen-space
   (let [board {[0 0] true [0 1] false [0 2] false
                [1 0] false [1 1] false [1 2] true
                [2 0] false [2 1] false [2 2] false}]
@@ -68,27 +68,44 @@
       (is (= {[0 0] true [0 1] false [0 2] false
               [1 0] false [1 1] false [1 2] true
               [2 0] false [2 1] false [2 2] false}
-             board))))
-  (testing "queen needs to move"
+             board)))))
+
+(deftest test-move-placed-queen
+  (testing "can move the queen"
     (let [board {[0 0] true [0 1] false [0 2] false [0 3] false
                  [1 0] false [1 1] false [1 2] true [1 3] false
                  [2 0] false [2 1] false [2 2] false [2 3] false
-                 [3 0] false [3 1] false [3 2] false [3 3] false }
-          {:keys [queen-placed? board]} (q/place-next-queen board 4 1 true)]
-      (is (not queen-placed?))
-      (is (= {[0 0] true [0 1] false [0 2] false
-              [1 0] false [1 1] false [1 2] true
-              [2 0] false [2 1] false [2 2] false}
+                 [3 0] false [3 1] false [3 2] false [3 3] false}
+          {:keys [queen-moved? board]} (q/move-placed-queen board 4 1)]
+      (is queen-moved?)
+      (is (= {[0 0] true [0 1] false [0 2] false [0 3] false
+              [1 0] false [1 1] false [1 2] false [1 3] true
+              [2 0] false [2 1] false [2 2] false [2 3] false
+              [3 0] false [3 1] false [3 2] false [3 3] false}
+             board))))
+  (testing "cannot move the queen"
+    (let [board {[0 0] true [0 1] false [0 2] false [0 3] false
+                 [1 0] false [1 1] false [1 2] false [1 3] true
+                 [2 0] false [2 1] false [2 2] false [2 3] false
+                 [3 0] false [3 1] false [3 2] false [3 3] false}
+          {:keys [queen-moved? board]} (q/move-placed-queen board 4 1)]
+      (is (not queen-moved?))
+      (is (= {[0 0] true [0 1] false [0 2] false [0 3] false
+              [1 0] false [1 1] false [1 2] false [1 3] false
+              [2 0] false [2 1] false [2 2] false [2 3] false
+              [3 0] false [3 1] false [3 2] false [3 3] false}
              board)))))
 
-#_(deftest test-solve
+(deftest test-solve
   (testing "board is unsolvable"
     (let [state (q/solve 3)]
-      (println state))
-    #_(let [{:keys [queen-placed? board]} (q/place-next-queen board 3 2)]
-      (is (not queen-placed?))
-      (is (= {[0 0] true [0 1] false [0 2] false
-              [1 0] false [1 1] false [1 2] true
-              [2 0] false [2 1] false [2 2] false}
-             board))))
+      (is (= :unsolvable (:result state)))))
+  (testing "board is solvable"
+    (let [state (q/solve 4)]
+      (is (= :solved (:result state)))
+      (is (= {[0 0] false [0 1] true [0 2] false [0 3] false
+              [1 0] false [1 1] false [1 2] false [1 3] true
+              [2 0] true [2 1] false [2 2] false [2 3] false
+              [3 0] false [3 1] false [3 2] true [3 3] false}
+             (:board state)))))
   )
