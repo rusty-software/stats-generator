@@ -8,7 +8,7 @@
           [2 0] false [2 1] false [2 2] false}
          (q/init-board 3))))
 
-#_(deftest test-queen-space
+(deftest test-queen-space
   (let [board {[0 0] true [0 1] false [0 2] false
                [1 0] false [1 1] false [1 2] true
                [2 0] false [2 1] false [2 2] false}]
@@ -107,5 +107,4 @@
               [1 0] false [1 1] false [1 2] false [1 3] true
               [2 0] true [2 1] false [2 2] false [2 3] false
               [3 0] false [3 1] false [3 2] true [3 3] false}
-             (:board state)))))
-  )
+             (:board state))))))
