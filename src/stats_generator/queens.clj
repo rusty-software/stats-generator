@@ -129,8 +129,9 @@
             (recur (assoc state :queen-placed? true
                                 :queen-to-place (inc queen-to-place)
                                 :board (:board placement-result)))
-            (recur (assoc state :queen-placed? false))))
-        ))))
+            (recur (assoc state :queen-placed? false))))))))
 
 (defn init []
-  (solve 8))
+  (let [{:keys [result board]} (solve 8)]
+    (println "RESULT:" result)
+    (println "BOARD:" (with-out-str (clojure.pprint/pprint (sort board))))))

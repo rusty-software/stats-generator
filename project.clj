@@ -7,4 +7,6 @@
                  [org.clojure/data.csv "0.1.4"]]
   :main ^:skip-aot stats-generator.main
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+
+  :aliases {"queens" ["run" "-m" "stats-generator.queens/init"]})
