@@ -131,7 +131,21 @@
                                 :board (:board placement-result)))
             (recur (assoc state :queen-placed? false))))))))
 
+(defn print-board [board board-size]
+  (let [board (into {} (sort board))]
+    (doseq [row (range board-size)]
+      (loop [column 0
+             output ""]
+        (if (= board-size column)
+          (println output)
+          (recur
+            (inc column)
+            (str output
+                 (if (get board [row column])
+                   "X|"
+                   "_|"))))))))
+
 (defn init []
   (let [{:keys [result board]} (solve 8)]
     (println "RESULT:" result)
-    (println "BOARD:" (with-out-str (clojure.pprint/pprint (sort board))))))
+    (print-board board 8)))
